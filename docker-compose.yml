@@ -58,6 +58,21 @@ services:
     ports:
       - "3000:3000"
 
+  loki:
+    image: grafana/loki:3.5
+    container_name: ${APP_NAME}-loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:3.5
+    container_name: ${APP_NAME}-promtail
+    volumes:
+      - ./logs:/logs:ro
+      - ./configs/promtail.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+
   app:
     build:
       context: .
@@ -74,6 +89,8 @@ services:
       - jaeger
       - prometheus
       - grafana
+      - loki
+      - promtail
 
 volumes:
   prometheus_data: {}
